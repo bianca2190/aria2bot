@@ -6,12 +6,12 @@ from urllib.parse import urlparse
 
 
 class Status(Enum):
-    active = '正在下载'
-    waiting = '等待下载'
-    paused = '暂停'
-    error = '错误'
-    complete = '完成'
-    removed = '已删除'
+    active = 'Mengunduh'
+    waiting = 'Menunggu untuk mengunduh'
+    paused = 'Berhenti sebentar'
+    error = 'Kesalahan'
+    complete = 'Menyelesaikan'
+    removed = 'Dihapus'
 
 
 def getEmByName(key):
@@ -51,8 +51,7 @@ async def order_moov(input, output):
 
 def byte2Readable(size):
     '''
-    auth: wangshengke@kedacom.com ；科达柯大侠
-    递归实现，精确为最大单位值 + 小数点后三位
+    auth: wangshengke@kedacom.com; Implementasi rekursif, akurat hingga nilai satuan terbesar + tiga angka desimal
     '''
 
     def strofsize(integer, remainder, level):
@@ -81,12 +80,13 @@ def progress(total_length, completed_length):
 def getFileName(task):
     if task.__contains__('bittorrent'):
         if task['bittorrent'].__contains__('info'):
-            # bt下载
+            # bt unduh
             return task['bittorrent']['info']['name']
-        # bt元信息
+        # bt informasi meta
         return task['files'][0]['path']
     filename = task['files'][0]['path'].split('/')[-1]
     if filename == '':
         pa = urlparse(task['files'][0]['uris'][0]['uri'])
         filename = os.path.basename(pa.path)
     return filename
+    
