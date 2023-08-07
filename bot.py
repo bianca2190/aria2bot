@@ -54,19 +54,19 @@ async def main():
 def get_menu(is_def_dir):
     return [
         [
-            Button.text('⬇️ Mengunduh',resize=True),
-            Button.text('⌛️ Menunggu',resize=True),
-            Button.text('✅ Selesai/Berhenti',resize=True)
+            Button.text('⬇️ Mengunduh',resize=False),
+            Button.text('⌛️ Menunggu',resize=False),
+            Button.text('✅ Selesai/Berhenti',resize=False)
         ],
         [
-            Button.text('⏸️ Menangguhkan tugas',resize=True),
-            Button.text('▶️ Tugas pemulihan',resize=True),
-            Button.text('❌ Menghapus tugas',resize=True),
+            Button.text('⏸️ Menangguhkan tugas',resize=False),
+            Button.text('▶️ Tugas pemulihan',resize=False),
+            Button.text('❌ Menghapus tugas',resize=False),
         ],
         [
-            Button.text('❌ ❌ Kosong selesai/berhenti',resize=True),
-            Button.text('❎ Buka direktori khusus' if is_def_dir else '✅ Tutup direktori khusus',resize=True),
-            Button.text('Tutup keyboard',resize=True),
+            Button.text('❌ ❌ Kosong selesai/berhenti',resize=False),
+            Button.text('❎ Buka direktori khusus' if is_def_dir else '✅ Tutup direktori khusus',resize=False),
+            Button.text('Tutup keyboard',resize=False),
         ],
     ]
 
