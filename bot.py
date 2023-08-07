@@ -20,7 +20,7 @@ JSON_RPC_URL = os.getenv('JSON_RPC_URL')
 JSON_RPC_TOKEN = os.getenv('JSON_RPC_TOKEN')
 
 SEND_ID = int(os.getenv('SEND_ID'))
-# 可选配置
+# Opsional
 PROXY_IP = os.getenv('PROXY_IP', None)
 PROXY_PORT = os.getenv('PROXY_PORT', None)
 
@@ -31,15 +31,15 @@ else:
 
 bot = TelegramClient(None, API_ID, API_HASH, proxy=proxy).start(bot_token=BOT_TOKEN)
 
-# 自定义目录绝对路径
+# Jalur absolut dari direktori khusus
 out_dir = ''
-# 是否默认目录
+# Apakah direktori default
 is_def_dir = True
 
 ar: Aria2Client = Aria2Client(JSON_RPC_URL, JSON_RPC_TOKEN, bot)
 
 
-# 入口
+# Pintu masuk
 async def main():
     await ar.init()
 
@@ -48,33 +48,33 @@ async def main():
     ar.client.onDownloadComplete(ar.on_download_complete)
     ar.client.onDownloadError(ar.on_download_error)
     bot.add_event_handler(BotCallbackHandler)
-    print('bot启动了')
+    print('Bot dimulai')
 
 
 def get_menu(is_def_dir):
     return [
         [
-            Button.text('⬇️正在下载',resize=True),
-            Button.text('⌛️ 正在等待',resize=True),
-            Button.text('✅ 已完成/停止',resize=True)
+            Button.text('⬇️ Mengunduh',resize=True),
+            Button.text('⌛️ Menunggu',resize=True),
+            Button.text('✅ Selesai/Berhenti',resize=True)
         ],
         [
-            Button.text('⏸️暂停任务',resize=True),
-            Button.text('▶️恢复任务',resize=True),
-            Button.text('❌ 删除任务',resize=True),
+            Button.text('⏸️ Menangguhkan tugas',resize=True),
+            Button.text('▶️ Tugas pemulihan',resize=True),
+            Button.text('❌ Menghapus tugas',resize=True),
         ],
         [
-            Button.text('❌ ❌ 清空已完成/停止',resize=True),
-            Button.text('❎ 开启自定义目录' if is_def_dir else '✅ 关闭自定义目录',resize=True),
-            Button.text('关闭键盘',resize=True),
+            Button.text('❌ ❌ Kosong selesai/berhenti',resize=True),
+            Button.text('❎ Buka direktori khusus' if is_def_dir else '✅ Tutup direktori khusus',resize=True),
+            Button.text('Tutup keyboard',resize=True),
         ],
     ]
 
 
-# 内联按钮回调===============
+# Panggilan balik tombol sebaris===============
 @events.register(events.CallbackQuery)
 async def BotCallbackHandler(event):
-    # 按钮点击后的回调
+    # Panggilan balik setelah klik tombol
     # print(event.data)
     d = str(event.data, encoding="utf-8")
     [type, gid] = d.split('.', 1)
@@ -86,15 +86,15 @@ async def BotCallbackHandler(event):
         await delToTask(event, gid)
 
 
-# 消息监听开始===============
+# Pemantauan pesan dimulai===============
 @bot.on(events.NewMessage(pattern='/menu', from_users=SEND_ID))
 async def send_welcome(event):
-    await event.respond('请选择一个选项', parse_mode='html', buttons=get_menu(is_def_dir))
+    await event.respond('Silakan pilih opsi', parse_mode='html', buttons=get_menu(is_def_dir))
 
 
 @bot.on(events.NewMessage(pattern="/close"))
 async def handler(event):
-    await event.reply("键盘已关闭", buttons=Button.clear())
+    await event.reply("Keyboard tertutup", buttons=Button.clear())
 
 
 @bot.on(events.NewMessage(pattern="/path", from_users=SEND_ID))
@@ -102,33 +102,33 @@ async def path(event):
     text = event.text;
     text = text.replace('/path ', '')
     if not text.startswith('/'):
-        await event.reply("目录必须是绝对路径")
+        await event.reply("Direktori harus berupa jalur absolut")
         return
     global out_dir
     out_dir = text
-    await event.reply(f"已设置自定义目录: {out_dir}")
+    await event.reply(f"Pengaturan direktori khusus: {out_dir}")
 
 
 @bot.on(events.NewMessage(pattern="/getpath"))
 async def getpath(event):
     if out_dir == '':
-        await event.reply(f"未设置自定义目录 /help 查看如何设置")
+        await event.reply(f"Direktori khusus tidak disetel /help Lihat cara mengaturnya")
         return
-    await event.reply(f"自定义目录: {out_dir}")
+    await event.reply(f"Direktori kustom: {out_dir}")
 
 
 @bot.on(events.NewMessage(pattern="/start"))
 async def handler(event):
-    await event.reply("aria2控制机器人,点击复制你的send_id:<code>%s</code>" % (str(event.chat_id)), parse_mode='html')
+    await event.reply("aria2 Untuk mengontrol robot, klik untuk menyalin send_id:<code>%s</code>" % (str(event.chat_id)), parse_mode='html')
 
 
 @bot.on(events.NewMessage(pattern="/help"))
 async def handler(event):
     await event.reply('''
-开启菜单: <code>/menu</code>
-关闭菜单: <code>/close</code>
-设置自定义目录(重启程序后需要重新设置): <code>/path 绝对路径</code>
-查看设置的自定义目录: <code>/getpath</code>
+Buka menu: <code>/menu</code>
+Tutup menu: <code>/close</code>
+Tetapkan direktori khusus (Anda perlu mengatur ulang setelah memulai ulang program): <code>/path jalur absolut</code>
+Lihat direktori kustom pengaturan: <code>/getpath</code>
     ''', parse_mode='html')
 
 
@@ -137,53 +137,53 @@ async def send_welcome(event):
     text = event.raw_text
     print(str(datetime.datetime.now()) + ':' + text)
     if ar.client is None or ar.client.closed:
-        # 重启客户端
+        # Mulai ulang klien
         await ar.init()
-    # 键盘消息
-    if text == '⬇️正在下载':
+    # Pesan papan ketik
+    if text == '⬇️ Mengunduh':
         await downloading(event)
         return
-    elif text == '⌛️ 正在等待':
+    elif text == '⌛️ Menunggu':
         await waiting(event)
         return
-    elif text == '✅ 已完成/停止':
+    elif text == '✅ Selesai/Berhenti':
         await stoped(event)
         return
-    elif text == '⏸️暂停任务':
+    elif text == '⏸️ Menangguhkan tugas':
         await stopTask(event)
         return
-    elif text == '▶️恢复任务':
+    elif text == '▶️ Tugas pemulihan':
         await unstopTask(event)
         return
-    elif text == '❌ 删除任务':
+    elif text == '❌ Menghapus tugas':
         await removeTask(event)
         return
-    elif text == '❌ ❌ 清空已完成/停止':
+    elif text == '❌ ❌ Kosong selesai/berhenti':
         await removeAll(event)
         return
-    elif '自定义目录' in text:
+    elif 'Direktori kustom' in text:
         global is_def_dir
         if out_dir == '':
-            await event.respond('请先设置自定义目录,提前在docker-compose.yml 配置挂载相应的目录,示例: /path /down')
+            await event.respond('Silakan atur direktori khusus terlebih dahulu, terlebih dahulu docker-compose.yml Konfigurasikan dan pasang direktori yang sesuai, misalnya: /path /down')
             return
         is_def_dir = not is_def_dir
 
-        await event.respond(f'已设置自定义目录状态为{"关闭" if is_def_dir else "开启"}', parse_mode='html',
+        await event.respond(f'Status direktori khusus telah disetel ke {"off" if is_def_dir else "on"}', parse_mode='html',
                             buttons=get_menu(is_def_dir))
         return
 
-    elif text == '关闭键盘':
-        await event.reply("键盘已关闭,/menu 开启键盘", buttons=Button.clear())
+    elif text == 'Tutup keyboard':
+        await event.reply("Keyboard mati,/menu membuka keyboard", buttons=Button.clear())
         return
 
     exta_dic = dict()
     if not is_def_dir and out_dir != '':
         exta_dic['dir'] = out_dir
 
-    # http 磁力链接
+    # http Tautan magnet
     if 'http' in text or 'magnet' in text:
 
-        # 正则匹配
+        # Pertandingan reguler
         res = re.findall('magnet:\?xt=urn:btih:[0-9a-fA-F]{40,}.*', text)
         for text in res:
             await ar.client.addUri(
@@ -210,8 +210,8 @@ async def send_welcome(event):
         if event.media and event.media.document:
             print(event.media.document.mime_type)
             if event.media.document.mime_type == 'application/x-bittorrent':
-                print('收到了一个种子')
-                await event.reply('收到了一个种子')
+                print('Menerima benih')
+                await event.reply('Menerima benih')
                 path = await bot.download_media(event.message)
                 print(path)
 
@@ -222,14 +222,14 @@ async def send_welcome(event):
         pass
 
 
-# 消息监听结束===============
+# Pemantauan pesan berakhir===============
 
 
-# 文本按钮回调方法=============================
+# Metode panggilan balik tombol teks=============================
 async def downloading(event):
     tasks = await ar.client.tellActive()
     if len(tasks) == 0:
-        await event.respond('没有正在运行的任务', parse_mode='html')
+        await event.respond('Tidak ada tugas yang berjalan', parse_mode='html')
         return
 
     send_str = ''
@@ -244,18 +244,18 @@ async def downloading(event):
         size = byte2Readable(int(totalLength))
         speed = hum_convert(int(downloadSpeed))
 
-        send_str = send_str + '任务名称: <b>' + fileName + '</b>\n进度: ' + prog + '\n大小: ' + size + '\n速度: ' + speed + '/s\n\n'
+        send_str = send_str + 'nama misi: <b>' + fileName + '</b>\njadwal: ' + prog + '\nukuran: ' + size + '\nkecepatan: ' + speed + '/s\n\n'
     if send_str == '':
-        await event.respond('个别任务无法识别名称，请使用aria2Ng查看', parse_mode='html')
+        await event.respond('Beberapa tugas tidak dapat mengenali namanya, harap gunakan aria2Ng untuk melihatnya', parse_mode='html')
         return
     await event.respond(send_str, parse_mode='html')
 
 
 async def waiting(event):
     tasks = await ar.client.tellWaiting(0, 30)
-    # 筛选send_id对应的正在下载任务
+    # Filter tugas pengunduhan yang sesuai dengan send_id
     if len(tasks) == 0:
-        await event.respond('没有正在等待的任务', parse_mode='markdown')
+        await event.respond('Tidak ada tugas yang tertunda', parse_mode='markdown')
         return
     send_str = ''
     for task in tasks:
@@ -267,7 +267,7 @@ async def waiting(event):
         size = byte2Readable(int(totalLength))
         speed = hum_convert(int(downloadSpeed))
 
-        send_str = send_str + '任务名称: ' + fileName + '\n进度: ' + prog + '\n大小: ' + size + '\n速度: ' + speed + '\n\n'
+        send_str = send_str + 'nama misi: ' + fileName + '\njadwal: ' + prog + '\nukuran: ' + size + '\nkecepatan: ' + speed + '\n\n'
     await event.respond(send_str, parse_mode='html')
 
 
@@ -275,7 +275,7 @@ async def stoped(event):
     tasks = await  ar.client.tellStopped(0, 500)
 
     if len(tasks) == 0:
-        await event.respond('没有已完成或停止的任务', parse_mode='markdown')
+        await event.respond('Tidak ada tugas yang selesai atau dihentikan', parse_mode='markdown')
         return
     send_str = ''
     for task in tasks:
@@ -287,32 +287,32 @@ async def stoped(event):
         size = byte2Readable(int(totalLength))
         speed = hum_convert(int(downloadSpeed))
 
-        send_str = send_str + '任务名称: ' + fileName + '\n进度: ' + prog + '\n大小: ' + size + '\n速度: ' + speed + '\n\n'
+        send_str = send_str + 'nama misi: ' + fileName + '\njadwal: ' + prog + '\nukuran: ' + size + '\nkecepatan: ' + speed + '\n\n'
     await event.respond(send_str, parse_mode='html')
 
 
 async def stopTask(event):
     tasks = await ar.client.tellActive()
 
-    # 筛选send_id对应的正在下载任务
+    # Filter tugas pengunduhan yang sesuai dengan send_id
     if len(tasks) == 0:
-        await event.respond('没有正在运行的任务,无暂停选项,请先添加任务', parse_mode='markdown')
+        await event.respond('Tidak ada tugas yang berjalan, tidak ada opsi jeda, harap tambahkan tugas terlebih dahulu', parse_mode='markdown')
         return
-    # 拼接所有任务
+    # Gabungkan semua tugas
     buttons = []
     for task in tasks:
         fileName = getFileName(task)
         gid = task['gid']
         buttons.append([Button.inline(fileName, 'pause-task.' + gid)])
 
-    await event.respond('请选择要暂停⏸️的任务', parse_mode='html', buttons=buttons)
+    await event.respond('Pilih tugas untuk dijeda ⏸️', parse_mode='html', buttons=buttons)
 
 
 async def unstopTask(event):
     tasks = await ar.client.tellWaiting(0, 500)
-    # 筛选send_id对应的任务
+    # Filter tugas yang sesuai dengan send_id
     if len(tasks) == 0:
-        await event.respond('没有已暂停的任务,无法恢复下载', parse_mode='markdown')
+        await event.respond('Tidak ada tugas yang dijeda, unduhan tidak dapat dilanjutkan', parse_mode='markdown')
         return
     buttons = []
     for task in tasks:
@@ -320,38 +320,38 @@ async def unstopTask(event):
         gid = task['gid']
         buttons.append([Button.inline(fileName, 'unpause-task.' + gid)])
 
-    await event.respond('请选择要恢复▶️的任务', parse_mode='html', buttons=buttons)
+    await event.respond('Silakan pilih tugas untuk dipulihkan ▶️', parse_mode='html', buttons=buttons)
 
 
 async def removeTask(event):
     tempTask = []
-    # 正在下载的任务
+    # Pengunduhan tugas
     tasks = await ar.client.tellActive()
     for task in tasks:
         tempTask.append(task)
-    # 正在等待的任务
+    # Tugas yang tertunda
     tasks = await  ar.client.tellWaiting(0, 1000)
     for task in tasks:
         tempTask.append(task)
     if len(tempTask) == 0:
-        await event.respond('没有正在运行或等待的任务,无删除选项', parse_mode='markdown')
+        await event.respond('Tidak ada tugas yang berjalan atau menunggu, tidak ada opsi hapus', parse_mode='markdown')
         return
 
-    # 拼接所有任务
+    # Gabungkan semua tugas
     buttons = []
     for task in tempTask:
         fileName = getFileName(task)
         gid = task['gid']
         buttons.append([Button.inline(fileName, 'del-task.' + gid)])
-    await event.respond('请选择要删除❌ 的任务', parse_mode='html', buttons=buttons)
+    await event.respond('Silakan pilih tugas untuk dihapus ❌', parse_mode='html', buttons=buttons)
 
 
 async def removeAll(event):
-    # 过滤 已完成或停止
+    # Pemfilteran selesai atau dihentikan
     tasks = await   ar.client.tellStopped(0, 500)
 
     if len(tasks) == 0:
-        await event.respond('没有要清空的任务', parse_mode='html')
+        await event.respond('Tidak ada tugas yang harus diselesaikan', parse_mode='html')
         return
 
     for task in tasks:
@@ -359,31 +359,31 @@ async def removeAll(event):
         dir = task['dir']
 
     try:
-        print('清空目录 ', dir)
+        print('Direktori kosong ', dir)
         shutil.rmtree(dir, ignore_errors=True)
     except Exception as e:
         print(e)
         pass
-    await event.respond('任务已清空,所有文件已删除', parse_mode='html')
+    await event.respond('Tugas telah dihapus dan semua file telah dihapus', parse_mode='html')
 
 
-# 文本按钮回调方法结束=============================
+# Metode callback tombol teks berakhir=============================
 
 
-# 调用暂停
+# Jeda panggilan
 async def pause(event, gid):
     await  ar.client.pause(gid)
 
 
-# 调用恢复
+# Pemulihan panggilan
 async def unpause(event, gid):
     await  ar.client.unpause(gid)
 
 
-# 调用删除
+# Hapus panggilan
 async def delToTask(event, gid):
     await  ar.client.remove(gid)
-    await bot.send_message(SEND_ID, '任务删除成功')
+    await bot.send_message(SEND_ID, 'Tugas berhasil dihapus')
 
 
 loop = asyncio.get_event_loop()
@@ -392,3 +392,4 @@ try:
     loop.run_forever()
 except KeyboardInterrupt:
     pass
+    
